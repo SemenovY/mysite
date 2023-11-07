@@ -8,6 +8,17 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 
 
+class PublishedManager(models.Manager):
+    """Менеджер, который позволит извлекать посты, используя обозначение Post.published.all()."""
+    def get_queryset(self):
+        """
+        Набор запросов QuerySet, фильтрующий посты по их статусу и
+        возвращающий поочередный набор запросов QuerySet, содержащий
+        посты только со статусом PUBLISHED.
+        """
+        return super().get_queryset().filter(status=Post.Status.PUBLISHED)
+
+
 class Post(models.Model):
     """
     Это модель данных для постов блога.
@@ -42,6 +53,8 @@ class Post(models.Model):
         choices=Status.choices,
         default=Status.DRAFT
     )
+    objects = models.Manager()  # менеджер, применяемый по умолчанию
+    published = PublishedManager()  # конкретно-прикладной менеджер
 
     class Meta:
         """
