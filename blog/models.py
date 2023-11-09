@@ -3,13 +3,15 @@
 Основные модели приложения blog.
 
 """
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User
 
 
 class PublishedManager(models.Manager):
-    """Менеджер, который позволит извлекать посты, используя обозначение Post.published.all()."""
+    """Менеджер, который позволит извлекать посты, используя обозначение
+    Post.published.all()."""
+
     def get_queryset(self):
         """
         Набор запросов QuerySet, фильтрующий посты по их статусу и
@@ -33,26 +35,20 @@ class Post(models.Model):
     """
 
     class Status(models.TextChoices):
-        """В постах будут использоваться статусы Draft (Черновик) и Published (Опубликован)."""
-        DRAFT = 'DF', 'Draft'
-        PUBLISHED = 'PB', 'Published'
+        """В постах будут использоваться статусы Draft (Черновик) и
+        Published (Опубликован)."""
+
+        DRAFT = "DF", "Draft"
+        PUBLISHED = "PB", "Published"
 
     title = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250)
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='blog_posts'
-    )
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="blog_posts")
     body = models.TextField()
     publish = models.DateTimeField(default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    status = models.CharField(
-        max_length=2,
-        choices=Status.choices,
-        default=Status.DRAFT
-    )
+    status = models.CharField(max_length=2, choices=Status.choices, default=Status.DRAFT)
     objects = models.Manager()  # менеджер, применяемый по умолчанию
     published = PublishedManager()  # конкретно-прикладной менеджер
 
@@ -63,9 +59,10 @@ class Post(models.Model):
         Добавлена опция indexes.
 
         """
-        ordering = ['-publish']
+
+        ordering = ["-publish"]
         indexes = [
-            models.Index(fields=['-publish']),
+            models.Index(fields=["-publish"]),
         ]
 
     def __str__(self):
